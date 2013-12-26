@@ -45,13 +45,12 @@ echo $ALERT " : " $WARNING
 if [ "$ALERT" = "YES" ];then
 echo "CRITICAL - flume log error message in last $INTERVAL min"
 exit $STATE_CRITICAL
-exit $STATE_OK
 elif [ "$WARNING" = "YES" ];then
 echo "WARNING - flume log warning message in last $INTERVAL min"
 exit $STATE_WARNING
 else
 echo "OK - flume log is ok in last $INTERVAL min"
-exit $STATE_CRITICAL
+exit $STATE_OK
 fi
 :<<\EOF
 EOF
