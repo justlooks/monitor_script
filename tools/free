@@ -1,0 +1,4 @@
+清理buffer/cache方法
+# sysctl vm.drop_caches=3
+vm.drop_caches = 3
+

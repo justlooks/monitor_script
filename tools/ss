@@ -1,0 +1,76 @@
+当系统中打开的socket数目庞大时，netstat就无法使用，因为它是通过读取/proc/net/tcp来获取信息，而ss则是通过tcp_diag来收集信息，有良好的可扩展性
+
+显示socket使用概况
+# ss -s
+Total: 614 (kernel 633)
+TCP:   34 (estab 5, closed 1, orphaned 0, synrecv 0, timewait 0/0), ports 24
+
+Transport Total     IP        IPv6
+*         633       -         -
+RAW       0         0         0
+UDP       26        22        4
+TCP       33        28        5
+INET      59        50        9
+FRAG      0         0         0
+
+只显示TCP部分的信息
+# ss  -t -s
+Total: 615 (kernel 633)
+TCP:   34 (estab 5, closed 1, orphaned 0, synrecv 0, timewait 0/0), ports 24
+
+Transport Total     IP        IPv6
+*         633       -         -
+RAW       0         0         0
+UDP       26        22        4
+TCP       33        28        5
+INET      59        50        9
+FRAG      0         0         0
+
+State      Recv-Q Send-Q      Local Address:Port          Peer Address:Port
+ESTAB      0      0          192.168.10.124:4505         192.168.10.22:38923
+ESTAB      0      0          192.168.10.124:4505         192.168.10.34:60125
+ESTAB      0      0          192.168.10.124:4505         192.168.10.36:52693
+ESTAB      0      0       ::ffff:192.168.10.124:ssh       ::ffff:192.168.2.166:orion-rmi-reg
+ESTAB      0      0          192.168.10.124:4505         192.168.10.35:39675
+
+显示使用socket的进程信息
+# ss  -p
+State      Recv-Q Send-Q      Local Address:Port          Peer Address:Port
+ESTAB      0      0          192.168.10.124:4505         192.168.10.22:38923                                                                                                     users:(("salt-master",8931,47))
+ESTAB      0      0          192.168.10.124:4505         192.168.10.34:60125                                                                                                     users:(("salt-master",8931,50))
+ESTAB      0      0          192.168.10.124:4505         192.168.10.36:52693                                                                                                     users:(("salt-master",8931,48))
+ESTAB      0      184     ::ffff:192.168.10.124:ssh       ::ffff:192.168.2.166:o                                                                                                 rion-rmi-reg  users:(("sshd",4171,3))
+ESTAB      0      0          192.168.10.124:4505         192.168.10.35:39675                                                                                                     users:(("salt-master",8931,49))
+
+
+# ss  -i
+State       Recv-Q Send-Q                                                      Local Address:Port                                                          Peer Address:Port
+ESTAB       0      0                                                          192.168.10.124:4505                                                         192.168.10.22:38923
+        bic wscale:7,7 rto:201 rtt:1/0.5 ato:40 send 23.2Mbps rcv_space:5792
+ESTAB       0      0                                                          192.168.10.124:4505                                                         192.168.10.34:60125
+        bic wscale:7,7 rto:201 rtt:1/0.5 ato:40 send 23.2Mbps rcv_space:5792
+ESTAB       0      0                                                          192.168.10.124:4505                                                         192.168.10.36:52693
+        bic wscale:7,7 rto:201 rtt:1/0.5 ato:40 send 23.2Mbps rcv_space:5792
+ESTAB       0      0                                                   ::ffff:192.168.10.124:ssh                                                   ::ffff:192.168.2.166:orion-rmi-reg
+        bic wscale:0,7 rto:363 rtt:105.625/64.5 ato:57 cwnd:3 send 331.7Kbps rcv_rtt:27711.4 rcv_space:24600
+ESTAB       0      0                                                          192.168.10.124:4505                                                         192.168.10.35:39675
+        bic wscale:7,7 rto:201 rtt:1/0.5 ato:40 send 23.2Mbps rcv_space:5792
+
+
+显示soket详细信息
+# ss -e
+State       Recv-Q Send-Q                                                      Local Address:Port                                                          Peer Address:Port
+ESTAB       0      0                                                          192.168.10.124:4505                                                         192.168.10.22:38923    ino:20772 sk:1c88c080ffff8106
+ESTAB       0      0                                                          192.168.10.124:4505                                                         192.168.10.34:60125    ino:20781 sk:1c88d340ffff8106
+ESTAB       0      0                                                          192.168.10.124:4505                                                         192.168.10.36:52693    ino:20774 sk:1c88c6c0ffff8106
+ESTAB       0      280                                                 ::ffff:192.168.10.124:ssh                                                   ::ffff:192.168.2.166:orion-rmi-reg  timer:(on,299ms,0) ino:3765516 sk:e4be71c0ffff8105
+ESTAB       0      0                                                          192.168.10.124:4505                                                         192.168.10.35:39675    ino:20779 sk:1c88cd00ffff8106
+
+显示时间信息
+# ss -o
+State      Recv-Q Send-Q      Local Address:Port          Peer Address:Port
+ESTAB      0      0          192.168.10.118:mysql       192.168.10.130:56056    timer:(keepalive,11min,0)
+ESTAB      0      0          192.168.10.118:mysql       192.168.10.130:56312    timer:(keepalive,11min,0)
+ESTAB      0      0          192.168.10.118:dyna-access      192.168.10.52:34638    timer:(keepalive,11min,0)
+ESTAB      0      0          192.168.10.118:dyna-access      192.168.10.50:38216    timer:(keepalive,11min,0)
+ESTAB      0      0          192.168.10.118:findviatv     192.168.10.134:55549    timer:(keepalive,10min,0)

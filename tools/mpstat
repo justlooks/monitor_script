@@ -1,0 +1,31 @@
+mpstat -P ALL 1
+其中ALL 表示所有CPU，或者可以在[0，CPU个数-1]间取值
+1表示间隔秒数
+11:00:56 AM  CPU   %user   %nice    %sys %iowait    %irq   %soft  %steal   %idle    intr/s
+11:00:57 AM  all    0.58    0.00    0.08    0.00    0.00    0.04    0.00   99.29   2446.00
+11:00:57 AM    0    0.00    0.00    0.00    0.00    0.00    0.00    0.00  100.00   1001.00
+11:00:57 AM    1    0.00    0.00    0.00    0.00    0.00    0.00    0.00  100.00      0.00
+
+soft 在间隔时间内软中断时间
+irq  在间隔时间内中断时间
+iowait  CPU等待硬盘IO时间
+intr/s  每秒收到的中断总数
+idle    CPU闲置时间，不包括等待磁盘IO时间
+
+idle高说明cpu load不高，iowait高说明磁盘IO严重
+
+从/proc/interrupts 可以判定是用到哪个中断控制器（8259A / APIC)
+查看设备中断号
+# awk '{print $1,$(NF-1),$NF}' /proc/interrupts
+查看某设备中断在各CPU的处理情况
+# awk 'NR==1||/^122/{print}' /proc/interrupts |less -S
+
+在/proc/irq/中断号目录下有smp_affinity文件，用来手动绑定设备到某些CPU，在执行绑定命令前需要先停掉irqbalance服务
+
+观察特定进程CPU使用情况
+# while :;do ps -eo pid,ni,pri,pcpu,psr,comm | grep mysql;sleep 1;done
+
+pcpu CPU占用百分比
+psr   目前进程被分配的CPU
+
+
